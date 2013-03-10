@@ -1,25 +1,36 @@
 #include <stdio.h>
 #include "conn_io.h" // make sure we implement the same API
+#include "packages.h"
 
-char *read_line(int socket_fd, char *s, int max_size) {
-	FILE *stream;
+int read_packet(FILE *stream, packet_struct *packet) {
+  unsigned short packet_id;  // this is network byte order
+  int n;
 
-	stream = fdopen(socket_fd, "r");
-	if( stream == NULL )
-	  return NULL;
-
-	return fgets(s, max_size, stream);
+  n = fread(&packet_id, 2, 1, stream);
+  if(n <= 0)
+    return -1;
+  packet->id = ntohs(packet_id);  // convert to host byte order
+  n = fread(&(*packet).target, 1, 1, stream);
+  if(n <= 0)
+    return -1;
+  n = fread(&(*packet).type, 1, 1, stream);
+  if(n <= 0)
+    return -1;
+  n = fread((*packet).content, 1, 128, stream);
+  if(n <= 0)
+    return -1;
+  return 0;
 }
 
-int send_all(int socket_fd, void* bytes, size_t len) {
+int send_packet(int socket_fd, packet_struct* packet) {
   size_t bytes_written,
 	 total_bytes_written = 0;
 
-  while( bytes_written != len )
+  while( bytes_written != PACKAGE_LENGTH )  // packages have a fixed length
   {
     bytes_written = write( socket_fd,
-		           bytes + total_bytes_written,
-			   len   - total_bytes_written);
+		           packet + total_bytes_written,
+			   PACKAGE_LENGTH   - total_bytes_written);
     if( bytes_written == -1 ) {
       perror("failed to write to client");
       return -1;

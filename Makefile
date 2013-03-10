@@ -7,10 +7,8 @@ BUILD_OPTS=-g
 clean:
 	rm -f *~ *.bak
 
-all: conn_client.c conn_client.h conn_server.c conn_server.h conn_io.c demo_tcp_client.c demo_tcp_server.c Makefile
-	gcc ${BUILD_OPTS} -c conn_client.c -o conn_client.o
-	gcc ${BUILD_OPTS} -c conn_server.c -o conn_server.o
-	gcc ${BUILD_OPTS} -c conn_io.c     -o conn_io.o
-	gcc ${BUILD_OPTS} demo_tcp_client.c conn_client.o conn_io.o ${EXTRA_LIBS} -o demo_tcp_client
-	gcc ${BUILD_OPTS} demo_tcp_server.c conn_server.o conn_io.o ${EXTRA_LIBS} -o demo_tcp_server
-
+all: conn_client.c conn_client.h conn_server.c conn_server.h conn_io.c main.c Makefile
+	llvm-gcc ${BUILD_OPTS} -c conn_client.c -o conn_client.o
+	llvm-gcc ${BUILD_OPTS} -c conn_server.c -o conn_server.o
+	llvm-gcc ${BUILD_OPTS} -c conn_io.c     -o conn_io.o
+	llvm-gcc ${BUILD_OPTS} main.c conn_client.o conn_server.o conn_io.o ${EXTRA_LIBS} -o meshnode
