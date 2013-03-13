@@ -8,34 +8,41 @@ int read_packet(FILE *stream, packet_struct *packet) {
 
   n = fread(&packet_id, 2, 1, stream);
   if(n <= 0)
+  {
     return -1;
+    printf("n=%d\n", n);    
+  }
   packet->id = ntohs(packet_id);  // convert to host byte order
-  n = fread(&(*packet).target, 1, 1, stream);
+  n = fread(&packet->target, 1, 1, stream);
   if(n <= 0)
     return -1;
-  n = fread(&(*packet).type, 1, 1, stream);
+  n = fread(&packet->type, 1, 1, stream);
   if(n <= 0)
     return -1;
-  n = fread((*packet).content, 1, 128, stream);
+  n = fread(&packet->content, 1, 128, stream);
   if(n <= 0)
     return -1;
   return 0;
 }
 
-int send_packet(int socket_fd, packet_struct* packet) {
-  size_t bytes_written,
-	 total_bytes_written = 0;
-
-  while( bytes_written != PACKAGE_LENGTH )  // packages have a fixed length
-  {
-    bytes_written = write( socket_fd,
-		           packet + total_bytes_written,
-			   PACKAGE_LENGTH   - total_bytes_written);
-    if( bytes_written == -1 ) {
-      perror("failed to write to client");
-      return -1;
-    }
-    total_bytes_written += bytes_written;
-  }
+int send_packet(FILE *stream, packet_struct *packet) {
+  unsigned short packet_id;  // this is network byte order
+  int n;
+  printf("send_packet %hu\n", packet->id);
+  packet_id = htons(packet->id);
+  n = fwrite(&packet_id, 2, 1, stream);
+  if(n <= 0)
+    return -1;
+  n = fwrite(&packet->target, 1, 1, stream);
+  if(n <= 0)
+    return -1;
+  n = fwrite(&packet->type, 1, 1, stream);
+  if(n <= 0)
+    return -1;
+  n = fwrite(&packet->content, 1, 128, stream);
+  if(n <= 0)
+    return -1;
+  fflush(stream);
+  return 0;
 }
 

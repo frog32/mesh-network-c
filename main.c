@@ -1,8 +1,7 @@
 #include <stdlib.h>      // exit
 #include <stdio.h>
-#include <string.h>      // strlen
 #include <unistd.h>      // getopt
-#include <pthread.h>
+
 #include "conn_server.h"
 #include "conn_io.h"     // send_all
 #include "packages.h"
@@ -61,71 +60,6 @@ void parse_options( int argc, char *argv[])
     report_error("no port provided");
     exit( -1);
   }
-}
-
-// ********** guard_connection **********
-
-typedef struct
-{
-  int id;
-  pthread_t thread;
-  int fd;
-  FILE *stream;
-} conn_struct;
-
-void *guard_connection(void *arg)
-{
-  packet_struct packet;  // used over and over again
-  conn_struct *connection = (conn_struct *)arg;
-  connection->stream = fdopen(connection->fd, "r");
-  if( connection->stream == NULL )
-  {
-    report_error("could not open fd");
-    return;
-  }
-  while(1)
-  {
-      if(read_packet(connection->stream, &packet) < 0)
-      {
-        // connection lost todo: handle loss
-        exit(-1);
-      }
-      switch(packet.type){
-        case 'N':
-          printf("neue verbindung erstellen\n");
-          break;
-        case 'O':
-          printf("Bestaetigung erhalten\n");
-          break;
-        case 'C':
-          printf("Datenpaket erhalten\n");
-          break;
-      }
-      printf("packet_id=%hu\n", packet.id);
-      printf("packet_type%c\n", packet.type);
-  }
-}
-
-void wait_for_clients(sock_fd)
-{
-  int i = 0; // doto remove
-  conn_struct *connections;
-  pthread_attr_t pthread_custom_attr;
-
-  connections=(conn_struct *)malloc(5*sizeof(*connections));
-  pthread_attr_init(&pthread_custom_attr);
-  while(1)
-  {
-    if( (connections[i].fd = connect_with_client( sock_fd )) != 0) {
-      pthread_create(&connections[i].thread, &pthread_custom_attr, guard_connection, (void *)(connections+i));
-      i++;
-    }
-    else {
-      report_error("failed to get a client connection");
-    }
-    
-  }
-
 }
 
 int main(int argc, char *argv[])
