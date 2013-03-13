@@ -3,13 +3,8 @@
 #include <unistd.h>      // getopt
 
 #include "conn_server.h"
-#include "conn_io.h"     // send_all
 #include "packages.h"
-
-void report_error( char* message ) {
-  fprintf( stderr, "ERROR: %s\n", message );
-}
-
+#include "check.h"
 
 
 // ********** optparse **********
@@ -57,7 +52,7 @@ void parse_options( int argc, char *argv[])
   } 
   
   if (tcp_port == NO_TCP_PORT ) {
-    report_error("no port provided");
+    printf("no port provided");
     exit( -1);
   }
 }
@@ -72,14 +67,10 @@ int main(int argc, char *argv[])
   printf("port %d\n", tcp_port);
   printf("role %d\n", node_role);
 
-  if( (sock_fd = listen_on_port(tcp_port) ) < 0 ) {
-    report_error("failed to listen on the port");
-    return sock_fd;
-  }
+  sock_fd = listen_on_port(tcp_port);
+  check_results("failed to listen to port", sock_fd);
 
   wait_for_clients(sock_fd);
 
   return 0; 
 }
-
-
