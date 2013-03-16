@@ -3,7 +3,6 @@
 
 #include <sys/queue.h>
 #include <pthread.h>
-#include <sys/time.h>
 
 // connection list
 SLIST_HEAD(, conn_entry) conn_head;
@@ -33,7 +32,7 @@ struct packet_entry
 	unsigned short id;
 	struct conn_entry *source;
   unsigned char target;
-	struct timeval timestamp;
+	int usec;
 } packet_tracker[100];
 
 
@@ -41,6 +40,7 @@ unsigned int conn_last_id = 0;
 
 pthread_mutex_t alter_conn_entries = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t use_routing_table = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t use_packet_tracker = PTHREAD_MUTEX_INITIALIZER;
 
 void *guard_connection(void *arg);
 
