@@ -23,7 +23,7 @@ int read_packet(FILE *stream, packet_struct *packet) {
     return n;
   if(!n)
     return -1;
-  n = fread(&packet->content, 1, 128, stream);
+  n = fread(&packet->content, 128, 1, stream);
   if(n < 0)
     return n;
   if(!n)
@@ -51,7 +51,7 @@ int send_packet(FILE *stream, packet_struct *packet) {
     return n;
   if(!n)
     return -1;
-  n = fwrite(&packet->content, 1, 128, stream);
+  n = fwrite(&packet->content, 128, 1, stream);
   if(n < 0)
     return n;
   if(!n)
