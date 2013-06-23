@@ -1,8 +1,8 @@
 #ifndef __CONNECTION_H__
 #define __CONNECTION_H__
 
-#include <sys/queue.h>
 #include <pthread.h>
+#include "queue.h"
 
 // connection list
 SLIST_HEAD(, conn_entry) conn_head;
