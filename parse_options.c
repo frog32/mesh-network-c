@@ -1,4 +1,5 @@
-#include <unistd.h>      // getopt
+// #include <unistd.h>      // getopt
+#include <getopt.h>       // fixed version of getopt
 #include <stdlib.h>      // exit
 #include <stdio.h>
 
@@ -17,7 +18,6 @@ void parse_options( int argc, char *argv[])
   int optchar;
 
   while( ( optchar = getopt( argc, argv, "-hqz" ) ) != -1 ) {
-    printf("optchar %d optarg %s\n", optchar, optarg);
     switch( optchar ) {
       case 'z':
         node_role = ZIEL;
@@ -26,7 +26,6 @@ void parse_options( int argc, char *argv[])
         node_role = QUELLE;
         break;;
       case 1: // optchar '-' will assign non-option to 1
-        printf("hier\n");
         tcp_port = atoi(optarg);
         break;;
       case 'h':
