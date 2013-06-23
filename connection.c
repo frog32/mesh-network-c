@@ -11,6 +11,7 @@
 #include "check.h"
 #include "conn_io.h"
 #include "conn_server.h"
+#include "parse_options.h"
 
 int create_outgoing_connection(packet_struct *packet)
 {
@@ -165,6 +166,14 @@ void handle_data_packet(packet_struct *packet, struct conn_entry *source_conn)
 
   res = pthread_mutex_lock(&use_packet_tracker);
   check_results("handle_data_packet lock packet tracker mutex", res);
+  if(packet->target == node_role)
+  {
+    // packet has arrived
+    // todo: packet umschreiben
+    packet->type = 'O';
+    dispatch_packet(packet, source_conn);
+    return;
+  }
 
   if(packet_tracker[packet->id % 100].id == packet->id)
   {
