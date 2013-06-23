@@ -5,57 +5,8 @@
 #include "conn_server.h"
 #include "packages.h"
 #include "check.h"
+#include "parse_options.h"
 
-
-// ********** optparse **********
-// Roles that a node can play
-#define HOP    0
-#define ZIEL   1
-#define QUELLE 2
-short node_role = HOP;
-
-#define NO_TCP_PORT -1
-int   tcp_port  = NO_TCP_PORT;
-
-void parse_options( int argc, char *argv[])
-{
-  extern char *optarg;
-  extern int optind, optopt;
-
-  char optchar;
-
-  while( ( optchar = getopt( argc, argv, "-hqz" ) ) != -1 ) {
-    switch( optchar ) {
-      case 'z':
-        node_role = ZIEL;
-        break;;
-      case 'q':
-        node_role = QUELLE;
-        break;;
-      case 1: // optchar '-' will assign non-option to 1
-        tcp_port = atoi(optarg);
-        break;;
-      case 'h':
-      case '?':
-      default:
-        printf("Usage: server port [-z|-q]\n");
-        exit( 0 );
-    }
-  }
-  for ( ; optind < argc; optind++)
-  {
-    if(argc - optind == 1)
-    {
-      // read in port
-      tcp_port = atoi(argv[optind]);
-    }
-  } 
-  
-  if (tcp_port == NO_TCP_PORT ) {
-    printf("no port provided");
-    exit( -1);
-  }
-}
 
 int main(int argc, char *argv[])
 {
