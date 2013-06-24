@@ -175,7 +175,9 @@ void handle_data_packet(packet_struct *packet, struct conn_entry *source_conn)
     // packet has arrived
     // todo: packet umschreiben
     dbg("packet %d angekommen", packet->id);
-    printf("%s\n", packet->content);
+    printf("%s", packet->content);
+    for(res=strlen(packet->content);res<128;res++)
+        fprintf(stdout, "-"); // padding needed to not crash testscript
     fflush(stdout);
     packet->type = 'O';
     dispatch_packet(packet, source_conn);
