@@ -112,6 +112,8 @@ void handle_ack_packet(packet_struct *packet, struct conn_entry *source_conn)
 
   if(packet_tracker[packet->id % 100].id != packet->id)
   {
+    res = pthread_mutex_unlock(&use_packet_tracker);
+    check_results("handle_ack_packet unlock packet tracker mutex on cancle", res);
     // printf("paket nicht mehr in tracker\n");
     return;
   }
@@ -164,8 +166,6 @@ void handle_data_packet(packet_struct *packet, struct conn_entry *source_conn)
   struct routing_entry *re;  // used in foreach
   struct conn_entry *ce;  // used in foreach
 
-  res = pthread_mutex_lock(&use_packet_tracker);
-  check_results("handle_data_packet lock packet tracker mutex", res);
   if(packet->target == node_role)
   {
     // packet has arrived
@@ -175,6 +175,9 @@ void handle_data_packet(packet_struct *packet, struct conn_entry *source_conn)
     dispatch_packet(packet, source_conn);
     return;
   }
+
+  res = pthread_mutex_lock(&use_packet_tracker);
+  check_results("handle_data_packet lock packet tracker mutex", res);
 
   if(packet_tracker[packet->id % 100].id == packet->id)
   {
