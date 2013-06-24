@@ -210,7 +210,7 @@ void handle_data_packet(packet_struct *packet, struct conn_entry *source_conn)
   {
     if(re->target == packet->target)
     {
-      // printf("fount in routing table\n");
+      // dbg("found %d in routing table", packet->id);
       ce = re->conn;
       break;
     }
@@ -226,7 +226,7 @@ void handle_data_packet(packet_struct *packet, struct conn_entry *source_conn)
   }
 
   // weiterleiten an einen oder an alle
-  // printf("send packet to all neighbors\n");
+  dbg("send packet %d to all neighbors", packet->id);
   SLIST_FOREACH(ce, &conn_head, entries)
   {
     if(ce != source_conn)
@@ -345,6 +345,8 @@ void wait_for_clients(int sock_fd)
   struct conn_entry *conn;
   pthread_attr_t pthread_custom_attr;
   pthread_t thread;
+
+  packet_tracker[0].id = 1; // don't initialize with 0 because this would drop packet with id0
 
   // start thread for packet_tracker
   pthread_attr_init(&pthread_custom_attr);

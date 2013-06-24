@@ -12,7 +12,6 @@
 int main(int argc, char *argv[])
 {
   int sock_fd;
-  // pthread_t pthread;
 
   parse_options( argc, argv );
 
