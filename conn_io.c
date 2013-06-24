@@ -34,7 +34,7 @@ int read_packet(FILE *stream, packet_struct *packet) {
 int send_packet(FILE *stream, packet_struct *packet) {
   unsigned short packet_id;  // this is network byte order
   int n;
-  printf("send_packet %hu\n", packet->id);
+  // printf("send_packet %hu\n", packet->id);
   packet_id = htons(packet->id);
   n = fwrite(&packet_id, 2, 1, stream);
   if(n < 0)

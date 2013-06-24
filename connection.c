@@ -76,7 +76,7 @@ void remove_from_connection_pool(struct conn_entry *conn)
   SLIST_FOREACH_SAFE(re, &routing_head, entries, re_temp) {
     if(re->conn == conn)
     {
-      printf("remove obsolete route to %d\n", re->target);
+      // printf("remove obsolete route to %d\n", re->target);
       SLIST_REMOVE(&routing_head, re, routing_entry, entries);
       free(re);
     }
@@ -112,7 +112,7 @@ void handle_ack_packet(packet_struct *packet, struct conn_entry *source_conn)
 
   if(packet_tracker[packet->id % 100].id != packet->id)
   {
-    printf("paket nicht mehr in tracker\n");
+    // printf("paket nicht mehr in tracker\n");
     return;
   }
 
@@ -149,7 +149,7 @@ void handle_ack_packet(packet_struct *packet, struct conn_entry *source_conn)
     re->conn = source_conn;
     re->target = packet_tracker[packet->id % 100].target;
     SLIST_INSERT_HEAD(&routing_head, re, entries);
-    printf("enter packet into routes\n");
+    // printf("enter packet into routes\n");
   }
   res = pthread_mutex_unlock(&use_routing_table);
   check_results("handle_ack_packet unlock routing table mutex", res);
@@ -200,7 +200,7 @@ void handle_data_packet(packet_struct *packet, struct conn_entry *source_conn)
   {
     if(re->target == packet->target)
     {
-      printf("fount in routing table\n");
+      // printf("fount in routing table\n");
       ce = re->conn;
       break;
     }
@@ -216,7 +216,7 @@ void handle_data_packet(packet_struct *packet, struct conn_entry *source_conn)
   }
 
   // weiterleiten an einen oder an alle
-  printf("send packet to all neighbors\n");
+  // printf("send packet to all neighbors\n");
   SLIST_FOREACH(ce, &conn_head, entries)
   {
     if(ce != source_conn)
@@ -253,7 +253,7 @@ void *clean_packet_tracker(void *arg)
           continue;
         if(packet_tracker[i].usec < val1 && packet_tracker[i].usec > val2)
           continue;
-        printf("lost package %hu\n", packet_tracker[i].id);
+        // printf("lost package %hu\n", packet_tracker[i].id);
         // this packet got lost remove it from routing
         SLIST_FOREACH_SAFE(re, &routing_head, entries, re_temp)
         {
@@ -289,11 +289,11 @@ void *guard_connection(void *arg)
   pthread_mutex_unlock(&conn->write_lock);
   check_results("guard_connection unlock mutex", res);
 
-  printf("new connection with id %d\n", conn->id);
+  // printf("new connection with id %d\n", conn->id);
 
   if( conn->read_stream == NULL || conn->write_stream == NULL)
   {
-    printf("could not open fd");
+    // printf("could not open fd");
     return NULL;
   }
   while(1)
@@ -301,28 +301,28 @@ void *guard_connection(void *arg)
     if(read_packet(conn->read_stream, &packet) < 0)
     {
       // wait for other thrads to unlock
-      printf("connection %d going down\n", conn->id);
+      // printf("connection %d going down\n", conn->id);
       res = pthread_mutex_lock(&conn->write_lock);
       check_results("guard_connection lock mutex", res);
       remove_from_connection_pool(conn);
       fclose(conn->read_stream);
       fclose(conn->write_stream);
-      printf("connection %d closed\n", conn->id);
+      // printf("connection %d closed\n", conn->id);
       pthread_mutex_destroy(&conn->write_lock);
       free(conn);
       return NULL;
     }
     switch(packet.type){
       case 'N':
-        printf("neue Verbindung erstellen\n");
+        // printf("neue Verbindung erstellen\n");
         create_outgoing_connection(&packet);
         break;
       case 'O':
-        printf("Bestaetigung erhalten\n");
+        // printf("Bestaetigung erhalten\n");
         handle_ack_packet(&packet, conn);
         break;
       case 'C':
-        printf("Datenpaket erhalten\n");
+        // printf("Datenpaket erhalten\n");
         handle_data_packet(&packet, conn);
         break;
     }
@@ -356,7 +356,7 @@ void wait_for_clients(int sock_fd)
       conn = malloc(sizeof(*conn));
     }
     else {
-      printf("failed to get a client connection");
+      // printf("failed to get a client connection");
     }
     
   }

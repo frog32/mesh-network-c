@@ -17,7 +17,7 @@ void parse_options( int argc, char *argv[])
 
   int optchar;
 
-  while( ( optchar = getopt( argc, argv, "-hqz" ) ) != -1 ) {
+  while( ( optchar = getopt( argc, argv, "-hqzv" ) ) != -1 ) {
     switch( optchar ) {
       case 'z':
         node_role = ZIEL;
