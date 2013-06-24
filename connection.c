@@ -170,6 +170,7 @@ void handle_data_packet(packet_struct *packet, struct conn_entry *source_conn)
   {
     // packet has arrived
     // todo: packet umschreiben
+    printf("%s", packet->content);
     packet->type = 'O';
     dispatch_packet(packet, source_conn);
     return;
@@ -286,7 +287,7 @@ void *guard_connection(void *arg)
   conn->write_stream = fdopen(dup(conn->fd), "w");
 
   // ready to write to this connection -> release lock
-  pthread_mutex_unlock(&conn->write_lock);
+  res = pthread_mutex_unlock(&conn->write_lock);
   check_results("guard_connection unlock mutex", res);
 
   // printf("new connection with id %d\n", conn->id);

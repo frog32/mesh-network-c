@@ -15,8 +15,8 @@ int main(int argc, char *argv[])
 
   parse_options( argc, argv );
 
-  printf("port %d\n", tcp_port);
-  printf("role %d\n", node_role);
+  // printf("port %d\n", tcp_port);
+  // printf("role %d\n", node_role);
 
   sock_fd = listen_on_port(tcp_port);
   check_results("failed to listen to port", sock_fd);
