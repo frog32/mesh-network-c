@@ -5,6 +5,7 @@
 #include <stdlib.h>      // exit
 #include <netinet/in.h>
 #include <sys/time.h>
+#include <arpa/inet.h>
 
 #include "packages.h"
 #include "connection.h"
@@ -30,7 +31,7 @@ int create_outgoing_connection(packet_struct *packet)
   memcpy(&(serv_addr.sin_port), &(packet->content[4]), 2);
   memcpy(&(serv_addr.sin_addr), &(packet->content), 4);
 
-  dbg("verbinde zu %d", serv_addr.sin_port);
+  dbg("verbinde zu %d", ntohs(serv_addr.sin_port));
 
   if( connect( conn->fd, (struct sockaddr *)&serv_addr, sizeof( serv_addr )) == -1 ){
     perror( "ERROR connecting" );
