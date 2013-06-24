@@ -4,11 +4,10 @@
 
 void dbg(char *msg_fmt, ...){
   va_list arg;
+  char message[128];
 
   va_start(arg, msg_fmt);
-	fprintf(stderr, "%d ", tcp_port);
-	vfprintf(stderr, msg_fmt, arg);
-	fprintf(stderr, "\n");
-
+  vsprintf(message, msg_fmt, arg);
   va_end (arg);
+  fprintf(stderr, "%d %s\n", tcp_port, message);
 }
