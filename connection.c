@@ -30,6 +30,8 @@ int create_outgoing_connection(packet_struct *packet)
   memcpy(&(serv_addr.sin_port), &(packet->content[4]), 2);
   memcpy(&(serv_addr.sin_addr), &(packet->content), 4);
 
+  dbg("verbinde zu %d", serv_addr.sin_port);
+
   if( connect( conn->fd, (struct sockaddr *)&serv_addr, sizeof( serv_addr )) == -1 ){
     perror( "ERROR connecting" );
     return -1;
@@ -314,22 +316,22 @@ void *guard_connection(void *arg)
       remove_from_connection_pool(conn);
       fclose(conn->read_stream);
       fclose(conn->write_stream);
-      dbg("connection %d closed\n", conn->id);
+      // dbg("connection %d closed", conn->id);
       pthread_mutex_destroy(&conn->write_lock);
       free(conn);
       return NULL;
     }
     switch(packet.type){
       case 'N':
-        dbg("neue Verbindung erstellen\n");
+        dbg("neue Verbindung erstellen");
         create_outgoing_connection(&packet);
         break;
       case 'O':
-        dbg("Bestaetigung erhalten\n");
+        dbg("Bestaetigung erhalten %d", packet.id);
         handle_ack_packet(&packet, conn);
         break;
       case 'C':
-        dbg("Datenpaket erhalten\n");
+        dbg("Datenpaket erhalten %d", packet.id);
         handle_data_packet(&packet, conn);
         break;
     }
