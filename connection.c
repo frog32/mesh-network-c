@@ -12,6 +12,7 @@
 #include "conn_io.h"
 #include "conn_server.h"
 #include "parse_options.h"
+#include "util.h"
 
 int create_outgoing_connection(packet_struct *packet)
 {
@@ -170,7 +171,9 @@ void handle_data_packet(packet_struct *packet, struct conn_entry *source_conn)
   {
     // packet has arrived
     // todo: packet umschreiben
-    printf("%s", packet->content);
+    dbg("packet %d angekommen", packet->id);
+    printf("%s\n", packet->content);
+    fflush(stdout);
     packet->type = 'O';
     dispatch_packet(packet, source_conn);
     return;
@@ -311,22 +314,22 @@ void *guard_connection(void *arg)
       remove_from_connection_pool(conn);
       fclose(conn->read_stream);
       fclose(conn->write_stream);
-      // printf("connection %d closed\n", conn->id);
+      dbg("connection %d closed\n", conn->id);
       pthread_mutex_destroy(&conn->write_lock);
       free(conn);
       return NULL;
     }
     switch(packet.type){
       case 'N':
-        // printf("neue Verbindung erstellen\n");
+        dbg("neue Verbindung erstellen\n");
         create_outgoing_connection(&packet);
         break;
       case 'O':
-        // printf("Bestaetigung erhalten\n");
+        dbg("Bestaetigung erhalten\n");
         handle_ack_packet(&packet, conn);
         break;
       case 'C':
-        // printf("Datenpaket erhalten\n");
+        dbg("Datenpaket erhalten\n");
         handle_data_packet(&packet, conn);
         break;
     }
